@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense, Fragment } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -19,10 +19,8 @@ interface Plan {
   isPaymentPlan?: boolean
 }
 
-export default function PlansPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+// Component that uses useSearchParams
+function TokenHandler() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -30,10 +28,19 @@ export default function PlansPage() {
     const token = searchParams.get("token")
     if (token) {
       localStorage.setItem("token", token)
-      localStorage.setItem("isAuthenticated", "true") // <-- Add this line
+      localStorage.setItem("isAuthenticated", "true")
       router.replace("/plans")
     }
   }, [searchParams, router])
+
+  return null
+}
+
+function PlansContent() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const authStatus = localStorage.getItem("isAuthenticated")
@@ -95,8 +102,8 @@ export default function PlansPage() {
     },
     {
       id: "navy-federal-playback",
-      title: "The Navy Federal Playback",
-      subtitle: "Secret HAck to Become a Member + Tips & Tricks",
+      title: "The Navy Federal Playbook",
+      subtitle: "Secret Hack to Become a Member + Tips & Tricks",
       price: "$150",
       buttonText: "Download Now",
       image: "/images/plans/5.jpeg",
@@ -135,6 +142,7 @@ export default function PlansPage() {
       image: "/images/plans/1.jpeg",
     },
   ]
+  
   if (!isAuthenticated) {
     return <div>Loading...</div>
   }
@@ -284,5 +292,17 @@ export default function PlansPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Main component that wraps TokenHandler in Suspense
+export default function PlansPage() {
+  return (
+    <Fragment>
+      <Suspense fallback={<div>Loading...</div>}>
+        <TokenHandler />
+      </Suspense>
+      <PlansContent />
+    </Fragment>
   )
 }
