@@ -23,33 +23,56 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // const handleLogin = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setIsLoading(true);
+
+  //   try {
+  //     const res = await fetch("http://localhost:5000/auth/login", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ email, password }),
+  //     });
+
+  //     if (!res.ok) {
+  //       const errorData = await res.json();
+  //       throw new Error(errorData.msg || "Login failed");
+  //     }
+
+  //     const data = await res.json();
+
+  //     // Store token and user data
+  //     localStorage.setItem("token", data.token);
+  //     localStorage.setItem("user", JSON.stringify(data.user));
+
+  //     router.push("/plans");
+  //   } catch (error: any) {
+  //     alert(error.message);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      // Simulate success login delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.msg || "Login failed");
-      }
-
-      const data = await res.json();
-
-      // Store token and user data
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // Simulate storing dummy token and user
+      localStorage.setItem("token", "dummy-token");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ email, name: "Test User" })
+      );
 
       router.push("/plans");
     } catch (error: any) {
-      alert(error.message);
+      alert("Something went wrong");
     } finally {
       setIsLoading(false);
     }
@@ -126,14 +149,14 @@ export default function LoginPage() {
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
-            <Button
+            {/* <Button
               onClick={() =>
                 (window.location.href = "http://localhost:5000/auth/google")
               }
               className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold"
             >
               Sign in with Google
-            </Button>
+            </Button> */}
           </form>
           <div className="text-center text-xs sm:text-sm text-gray-400">
             Don't have an account?{" "}

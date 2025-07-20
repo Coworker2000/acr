@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, Suspense, Fragment } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -19,37 +19,30 @@ interface Plan {
   isPaymentPlan?: boolean
 }
 
-// Component that uses useSearchParams
-function TokenHandler() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  useEffect(() => {
-    const token = searchParams.get("token")
-    if (token) {
-      localStorage.setItem("token", token)
-      localStorage.setItem("isAuthenticated", "true")
-      router.replace("/plans")
-    }
-  }, [searchParams, router])
-
-  return null
-}
-
-function PlansContent() {
+export default function PlansPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
-  useEffect(() => {
-    const authStatus = localStorage.getItem("isAuthenticated")
-    if (!authStatus) {
-      router.push("/login")
-    } else {
-      setIsAuthenticated(true)
-    }
-  }, [router])
+  // useEffect(() => {
+  //   const token = searchParams.get("token")
+  //   if (token) {
+  //     localStorage.setItem("token", token)
+  //     localStorage.setItem("isAuthenticated", "true") // <-- Add this line
+  //     router.replace("/plans")
+  //   }
+  // }, [searchParams, router])
+
+  // useEffect(() => {
+  //   const authStatus = localStorage.getItem("isAuthenticated")
+  //   if (!authStatus) {
+  //     router.push("/login")
+  //   } else {
+  //     setIsAuthenticated(true)
+  //   }
+  // }, [router])
 
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated")
@@ -88,64 +81,23 @@ function PlansContent() {
       title: "VIP Fast Track Program",
       subtitle: "Results in as little as 7-15 days!",
       price: "$750",
-      originalPrice: "$2,000",
+      originalPrice: "$1500",
       buttonText: "Get Started!",
       image: "/images/plans/3.jpeg",
     },
     {
-      id: "late-payment-guide",
-      title: "The Late Payment Removal Guide",
-      subtitle: "ONLY $100 FOR A LIMITED TIME",
-      price: "$100",
-      buttonText: "Download Now",
-      image: "/images/plans/4.jpeg",
-    },
-    {
-      id: "navy-federal-playback",
-      title: "The Navy Federal Playbook",
-      subtitle: "Secret Hack to Become a Member + Tips & Tricks",
-      price: "$150",
-      buttonText: "Download Now",
-      image: "/images/plans/5.jpeg",
-    },
-    {
       id: "instant-tradeline",
       title: "$2500 Instant Tradeline",
-      subtitle: "Boost Your Credit 40-100 Points Fast",
-      price: "$2500",
+      subtitle: "Boost Your Credit Score by 40–100 Points — Fast! Results in as little as 7 days term!",
+      price: "$1500",
       originalPrice: "$3,000",
       buttonText: "I Need This!",
-      image: "/images/plans/6.jpeg",
-    },
-    {
-      id: "vip-current-clients",
-      title: "VIP Fast Track Program",
-      subtitle: "For Current Clients Only",
-      price: "$500",
-      buttonText: "Upgrade Me Please!",
-      image: "/images/plans/2.jpeg",
-    },
-    {
-      id: "consultation",
-      title: "Schedule a Consultation",
-      subtitle: "30 Min Call w/ Sasha Yvonne",
-      price: "",
-      buttonText: "Schedule a Call",
       image: "/images/plans/4.jpeg",
     },
-    {
-      id: "progress-call",
-      title: "Progress Call - Current Clients Only",
-      subtitle: "15 Min Call w/ Sasha Yvonne",
-      price: "",
-      buttonText: "Schedule a Call",
-      image: "/images/plans/1.jpeg",
-    },
   ]
-  
-  if (!isAuthenticated) {
-    return <div>Loading...</div>
-  }
+  // if (!isAuthenticated) {
+  //   return <div>Loading...</div>
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800">
@@ -292,17 +244,5 @@ function PlansContent() {
         </div>
       </div>
     </div>
-  )
-}
-
-// Main component that wraps TokenHandler in Suspense
-export default function PlansPage() {
-  return (
-    <Fragment>
-      <Suspense fallback={<div>Loading...</div>}>
-        <TokenHandler />
-      </Suspense>
-      <PlansContent />
-    </Fragment>
   )
 }
