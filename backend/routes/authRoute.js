@@ -3,8 +3,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET;
-const CLIENT_URL = process.env.CLIENT_URL;
+const JWT_SECRET = process.env.JWT_SECRET; // Use a strong secret in production
 
 function generateJwt(user) {
   // Customize payload as needed
@@ -28,10 +27,9 @@ router.get('/auth/google/callback',
   passport.authenticate('google', { session: false }),
   (req, res) => {
     const token = generateJwt(req.user);
-    res.redirect(`${process.env.CLIENT_URL}/plans?token=${token}`);
+    res.redirect(`http://localhost:3000/plans?token=${token}`);
   }
 );
-
 
 // Logout route
 router.get('/logout', (req, res) => {
