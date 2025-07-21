@@ -16,9 +16,14 @@ const io = new Server(server, {
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
+
 // Middleware
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "https://arleen-credits.vercel.app",
   credentials: true
 }));
 app.use(express.json());
@@ -54,6 +59,7 @@ io.on('connection', (socket) => {
     console.log('User disconnected', socket.id);
   });
 });
+
 
 
 

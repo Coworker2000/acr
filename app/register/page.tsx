@@ -243,7 +243,7 @@ export default function RegisterPage() {
                     <Input
                       id="state"
                       placeholder="State"
-                      value={formData.city}
+                      value={formData.state}
                       onChange={(e) =>
                         handleInputChange("state", e.target.value)
                       }
