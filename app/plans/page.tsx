@@ -245,6 +245,7 @@ function PlansPageContent() {
                       onClick={(e) => {
                         e.stopPropagation();
                         handlePlanSelect(plan);
+                        router.push("/chat");
                       }}
                     >
                       {plan.buttonText}
