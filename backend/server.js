@@ -3,7 +3,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
-const passport = require('passport');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const { Server } = require('socket.io');
@@ -29,9 +28,6 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
-app.use(passport.initialize());
-app.use(passport.session());
-require('./config/passport')(passport);
 
 // MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -41,6 +37,9 @@ mongoose.connect(process.env.MONGO_URI)
 // Routes
 const authRoutes = require('./routes/authRoute');
 app.use('/', authRoutes);
+const registerRoute = require('./routes/registerRoute');
+app.use('/', registerRoute);
+
 
 
 // Socket.io
