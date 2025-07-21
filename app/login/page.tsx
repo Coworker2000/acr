@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -28,13 +30,16 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await fetch(
+        "https://arleen-credit-repair-backend.onrender.com/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -43,13 +48,13 @@ export default function LoginPage() {
 
       const data = await res.json();
 
-      // Store token and user data
+      // Store token and user info
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       router.push("/plans");
     } catch (error: any) {
-      alert(error.message);
+      alert(error.message || "Login failed");
     } finally {
       setIsLoading(false);
     }
@@ -126,14 +131,14 @@ export default function LoginPage() {
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
-            <Button
+            {/* <Button
               onClick={() =>
                 (window.location.href = "http://localhost:5000/auth/google")
               }
               className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold"
             >
               Sign in with Google
-            </Button>
+            </Button> */}
           </form>
           <div className="text-center text-xs sm:text-sm text-gray-400">
             Don't have an account?{" "}

@@ -27,11 +27,11 @@ export default function ChatPage() {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const authStatus = localStorage.getItem("isAuthenticated")
-    if (!authStatus) {
-      router.push("/login")
-      return
-    }
+    // const authStatus = localStorage.getItem("isAuthenticated")
+    // if (!authStatus) {
+    //   router.push("/login")
+    //   return
+    // }
     setIsAuthenticated(true)
 
     // Get selected plan from localStorage
