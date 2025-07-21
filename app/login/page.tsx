@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -23,56 +25,36 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // const handleLogin = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setIsLoading(true);
-
-  //   try {
-  //     const res = await fetch("http://localhost:5000/auth/login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ email, password }),
-  //     });
-
-  //     if (!res.ok) {
-  //       const errorData = await res.json();
-  //       throw new Error(errorData.msg || "Login failed");
-  //     }
-
-  //     const data = await res.json();
-
-  //     // Store token and user data
-  //     localStorage.setItem("token", data.token);
-  //     localStorage.setItem("user", JSON.stringify(data.user));
-
-  //     router.push("/plans");
-  //   } catch (error: any) {
-  //     alert(error.message);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Simulate success login delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Simulate storing dummy token and user
-      localStorage.setItem("token", "dummy-token");
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ email, name: "Test User" })
+      const res = await fetch(
+        "https://arleen-credit-repair-backend.onrender.com/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
       );
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.msg || "Login failed");
+      }
+
+      const data = await res.json();
+
+      // Store token and user info
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       router.push("/plans");
     } catch (error: any) {
-      alert("Something went wrong");
+      alert(error.message || "Login failed");
     } finally {
       setIsLoading(false);
     }
