@@ -1,5 +1,21 @@
 {
   "pages": {
+    "/login/page": [
+      "static/chunks/[root of the server]__23ac364f._.css",
+      "static/chunks/node_modules_next_dist_1a6ee436._.js",
+      "static/chunks/app_layout_tsx_f0e4c1a2._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_0fc49ce2._.js",
+      "static/chunks/node_modules_7d40bb4e._.js",
+      "static/chunks/_6cdeb604._.js",
+      "static/chunks/app_login_page_tsx_0f3052b9._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_49a6ea35._.js",
+      "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
+      "static/chunks/node_modules_next_dist_client_43e3ffb8._.js",
+      "static/chunks/node_modules_next_dist_3bfaed20._.js",
+      "static/chunks/node_modules_@swc_helpers_cjs_00636ac3._.js",
+      "static/chunks/_e69f0d32._.js",
+      "static/chunks/_be317ff2._.js"
+    ],
     "/page": [
       "static/chunks/[root of the server]__23ac364f._.css",
       "static/chunks/node_modules_next_dist_1a6ee436._.js",
@@ -8,6 +24,22 @@
       "static/chunks/_9e123558._.js",
       "static/chunks/node_modules_5b5a52ce._.js",
       "static/chunks/app_page_tsx_0f3052b9._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_49a6ea35._.js",
+      "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
+      "static/chunks/node_modules_next_dist_client_43e3ffb8._.js",
+      "static/chunks/node_modules_next_dist_3bfaed20._.js",
+      "static/chunks/node_modules_@swc_helpers_cjs_00636ac3._.js",
+      "static/chunks/_e69f0d32._.js",
+      "static/chunks/_be317ff2._.js"
+    ],
+    "/plans/page": [
+      "static/chunks/[root of the server]__23ac364f._.css",
+      "static/chunks/node_modules_next_dist_1a6ee436._.js",
+      "static/chunks/app_layout_tsx_f0e4c1a2._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_08b40e1b._.js",
+      "static/chunks/node_modules_8f9c00c2._.js",
+      "static/chunks/_134d2939._.js",
+      "static/chunks/app_plans_page_tsx_0f3052b9._.js",
       "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_49a6ea35._.js",
       "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
       "static/chunks/node_modules_next_dist_client_43e3ffb8._.js",
