@@ -10,23 +10,15 @@ exports.register = async (req, res) => {
       email,
       phone,
       password,
-      dateOfBirth,
-      ssn,
       address,
       city,
       state,
       zipCode,
-      currentCreditScore,
-      goalCreditScore,
-      monthlyIncome,
-      employmentStatus,
-      housingStatus,
-      bankruptcyHistory,
       creditGoals,
       hearAboutUs,
     } = req.body;
 
-    if (!email || !password || !firstName || !lastName) {
+    if (!email || !password || !firstName || !lastName || !phone || !address || !city || !state || !zipCode || !creditGoals || !hearAboutUs) {
   return res.status(400).json({ msg: "Missing required fields" });
 }
 
@@ -46,18 +38,9 @@ exports.register = async (req, res) => {
       email,
       phone,
       password: hash,
-      dateOfBirth,
-      ssn,
-      address,
       city,
       state,
       zipCode,
-      currentCreditScore,
-      goalCreditScore,
-      monthlyIncome,
-      employmentStatus,
-      housingStatus,
-      bankruptcyHistory,
       creditGoals,
       hearAboutUs,
     });
@@ -75,7 +58,7 @@ exports.register = async (req, res) => {
       token,
       user: {
         id: user._id,
-        username: user.firstName,
+        username: user.lastName,
         email: user.email,
       },
     });
@@ -98,6 +81,6 @@ exports.login = async (req, res) => {
 
   res.json({
     token,
-    user: { id: user._id, username: user.firstName, email: user.email },
+    user: { id: user._id, username: user.lastName, email: user.email },
   });
 };

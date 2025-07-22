@@ -33,18 +33,10 @@ export default function RegisterPage() {
     phone: "",
     password: "",
     confirmPassword: "",
-    dateOfBirth: "",
-    ssn: "",
     address: "",
     city: "",
     state: "",
     zipCode: "",
-    currentCreditScore: "",
-    goalCreditScore: "",
-    monthlyIncome: "",
-    employmentStatus: "",
-    housingStatus: "",
-    bankruptcyHistory: "",
     creditGoals: "",
     hearAboutUs: "",
     agreeToTerms: false,
@@ -68,18 +60,43 @@ export default function RegisterPage() {
     }
 
     if (!formData.agreeToTerms || !formData.agreeToCredit) {
-      alert("Please agree to all terms and conditions")
-      return
+      alert("Please agree to all terms and conditions");
+      return;
     }
-    setIsLoading(true)
-    // Simulate registration process
-    setTimeout(() => {
-      localStorage.setItem("isAuthenticated", "true")
-      localStorage.setItem("userEmail", formData.email)
-      router.push("/plans")
-      setIsLoading(false)
-    }, 1500)
-  }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(
+        "https://arleen-credit-repair-backend.onrender.com/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.msg || "Registration failed");
+        return;
+      }
+
+      // Save auth token or user info locally if needed
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userEmail", data.user.email);
+
+      router.push("/plans");
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("Something went wrong. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800 py-4 sm:py-8 px-4">
