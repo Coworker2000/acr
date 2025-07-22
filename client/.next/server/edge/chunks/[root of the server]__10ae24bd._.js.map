@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 23, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/middleware.ts"],"sourcesContent":["import { NextResponse } from \"next/server\"\nimport type { NextRequest } from \"next/server\"\n\nexport function middleware(request: NextRequest) {\n  // Check if user is trying to access protected routes\n  const protectedRoutes = [\"/plans\", \"/chat\"]\n  const isProtectedRoute = protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))\n\n  if (isProtectedRoute) {\n    // In a real app, you'd check for a valid JWT token\n    // For this demo, we'll check localStorage on the client side\n    const response = NextResponse.next()\n    response.headers.set(\"x-middleware-cache\", \"no-cache\")\n    return response\n  }\n\n  return NextResponse.next()\n}\n\nexport const config = {\n  matcher: [\"/plans/:path*\", \"/chat/:path*\"],\n}\n"],"names":[],"mappings":";;;;AAAA;AAAA;;AAGO,SAAS,WAAW,OAAoB;IAC7C,qDAAqD;IACrD,MAAM,kBAAkB;QAAC;QAAU;KAAQ;IAC3C,MAAM,mBAAmB,gBAAgB,IAAI,CAAC,CAAC,QAAU,QAAQ,OAAO,CAAC,QAAQ,CAAC,UAAU,CAAC;IAE7F,IAAI,kBAAkB;QACpB,mDAAmD;QACnD,6DAA6D;QAC7D,MAAM,WAAW,6LAAA,CAAA,eAAY,CAAC,IAAI;QAClC,SAAS,OAAO,CAAC,GAAG,CAAC,sBAAsB;QAC3C,OAAO;IACT;IAEA,OAAO,6LAAA,CAAA,eAAY,CAAC,IAAI;AAC1B;AAEO,MAAM,SAAS;IACpB,SAAS;QAAC;QAAiB;KAAe;AAC5C"}}]
+}
