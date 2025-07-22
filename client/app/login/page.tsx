@@ -146,6 +146,16 @@ export default function LoginPage() {
               Sign up
             </Link>
           </div>
+          
+          <div className="text-center pt-4 border-t border-white/10">
+            <p className="text-xs text-gray-400 mb-2">Are you an agent?</p>
+            <Link 
+              href="/agent/login" 
+              className="text-xs text-white hover:text-gray-300 underline"
+            >
+              Access Agent Portal
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

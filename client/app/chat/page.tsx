@@ -6,14 +6,22 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
-import { Send, ArrowLeft, User, Bot } from "lucide-react"
+import { Send, ArrowLeft, User, Bot, Wifi, WifiOff } from "lucide-react"
 import Link from "next/link"
+import SocketService from "@/lib/socket"
 
 interface Message {
-  id: string
+  _id?: string
   text: string
   sender: "user" | "agent"
   timestamp: Date
+}
+
+interface ChatData {
+  chatId: string
+  messages: Message[]
+  selectedPlan?: any
+  status: string
 }
 
 export default function ChatPage() {
@@ -22,36 +30,118 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
+  const [agentTyping, setAgentTyping] = useState(false)
+  const [isConnected, setIsConnected] = useState(false)
+  const [agentOnline, setAgentOnline] = useState(false)
+  const [chatId, setChatId] = useState<string | null>(null)
+  const [userName, setUserName] = useState('')
+  const [userEmail, setUserEmail] = useState('')
   const router = useRouter()
   const chatEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const socketService = SocketService.getInstance()
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  // Initialize chat and Socket.IO connection
   useEffect(() => {
-    // const authStatus = localStorage.getItem("isAuthenticated")
-    // if (!authStatus) {
-    //   router.push("/login")
-    //   return
-    // }
-    setIsAuthenticated(true)
-
-    // Get selected plan from localStorage
-    const plan = localStorage.getItem("selectedPlan")
-    if (plan) {
-      setSelectedPlan(JSON.parse(plan))
+    const initializeChat = async () => {
+      // Set authentication (in production, verify token)
+      setIsAuthenticated(true)
+      
+      // Get user info from localStorage (normally from auth token)
+      const storedEmail = localStorage.getItem('userEmail') || 'demo@user.com'
+      const storedName = localStorage.getItem('userName') || 'Demo User'
+      setUserEmail(storedEmail)
+      setUserName(storedName)
+      
+      // Get selected plan from localStorage
+      const plan = localStorage.getItem("selectedPlan")
+      if (plan) {
+        setSelectedPlan(JSON.parse(plan))
+      }
+      
+      // Connect to Socket.IO
+      const socket = socketService.connect()
+      
+      socket.on('connect', () => {
+        setIsConnected(true)
+        console.log('Connected to chat server')
+      })
+      
+      socket.on('disconnect', () => {
+        setIsConnected(false)
+        setAgentOnline(false)
+        console.log('Disconnected from chat server')
+      })
+      
+      // Create or get existing chat
+      try {
+        const response = await fetch('http://localhost:5000/chat/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userEmail: storedEmail,
+            userName: storedName,
+            selectedPlan: plan ? JSON.parse(plan) : null
+          })
+        })
+        
+        const data = await response.json()
+        if (data.success) {
+          const chat = data.chat
+          setChatId(chat.chatId)
+          setMessages(chat.messages.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          })))
+          
+          // Join the chat room
+          socketService.joinChat(chat.chatId, 'user')
+        }
+      } catch (error) {
+        console.error('Error initializing chat:', error)
+        // Fallback to offline mode with demo message
+        const welcomeMessage: Message = {
+          _id: '1',
+          text: plan
+            ? `Hello! I see you're interested in our ${JSON.parse(plan).title}. I'm here to help you with pricing, payment options, and answer any questions you might have about this program. How can I assist you today?`
+            : "Hello! Welcome to The Arleen Credit Repair Program. I'm here to help you choose the right plan and answer any questions about our services. How can I assist you today?",
+          sender: "agent",
+          timestamp: new Date(),
+        }
+        setMessages([welcomeMessage])
+      }
+      
+      // Set up Socket.IO event listeners
+      socket.on('receive_message', (message) => {
+        setMessages(prev => [...prev, {
+          ...message,
+          timestamp: new Date(message.timestamp)
+        }])
+      })
+      
+      socket.on('user_typing', (data) => {
+        if (data.userType === 'agent') {
+          setAgentTyping(data.isTyping)
+        }
+      })
+      
+      socket.on('agent_status', (data) => {
+        setAgentOnline(data.isOnline)
+      })
     }
-
-    // Initialize chat with welcome message
-    const welcomeMessage: Message = {
-      id: "1",
-      text: plan
-        ? `Hello! I see you're interested in our ${JSON.parse(plan).title}${
-            JSON.parse(plan).price ? ` for ${JSON.parse(plan).price}` : ""
-          }. I'm here to help you with pricing, payment options, and answer any questions you might have about this program. How can I assist you today?`
-        : "Hello! Welcome to The Arleen Credit Repair Program. I'm here to help you choose the right plan and answer any questions about our services. How can I assist you today?",
-      sender: "agent",
-      timestamp: new Date(),
+    
+    initializeChat()
+    
+    // Cleanup on unmount
+    return () => {
+      if (chatId) {
+        socketService.leaveChat(chatId, 'user')
+      }
+      socketService.disconnect()
     }
-    setMessages([welcomeMessage])
   }, [router])
 
   useEffect(() => {
@@ -62,31 +152,42 @@ export default function ChatPage() {
   }, [messages, isTyping])
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim()) return
+    if (!newMessage.trim() || !chatId) return
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: newMessage,
-      sender: "user",
-      timestamp: new Date(),
-    }
-
-    setMessages((prev) => [...prev, userMessage])
+    const messageText = newMessage
     setNewMessage("")
-    setIsTyping(true)
-
-    // Simulate agent response
-    setTimeout(() => {
-      const agentResponse = generateAgentResponse(newMessage, selectedPlan)
-      const agentMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: agentResponse,
-        sender: "agent",
-        timestamp: new Date(),
+    
+    // Stop typing indicator
+    socketService.stopTyping(chatId, 'user')
+    
+    // Send message via Socket.IO
+    socketService.sendMessage({
+      chatId,
+      text: messageText,
+      sender: 'user',
+      senderName: userName
+    })
+  }
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value)
+    
+    if (chatId && e.target.value.trim()) {
+      // Start typing indicator
+      socketService.startTyping(chatId, 'user')
+      
+      // Clear previous timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
       }
-      setMessages((prev) => [...prev, agentMessage])
-      setIsTyping(false)
-    }, 1500)
+      
+      // Stop typing after 3 seconds of inactivity
+      typingTimeoutRef.current = setTimeout(() => {
+        socketService.stopTyping(chatId, 'user')
+      }, 3000)
+    } else if (chatId) {
+      socketService.stopTyping(chatId, 'user')
+    }
   }
 
   const generateAgentResponse = (userMessage: string, plan: any) => {
@@ -208,9 +309,9 @@ export default function ChatPage() {
                       scrollbarColor: "rgba(255, 255, 255, 0.3) transparent",
                     }}
                   >
-                    {messages.map((message) => (
+                    {messages.map((message, index) => (
                       <div
-                        key={message.id}
+                        key={message._id || index}
                         className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
@@ -257,7 +358,7 @@ export default function ChatPage() {
                   <div className="flex space-x-2">
                     <Input
                       value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
+                      onChange={handleInputChange}
                       onKeyPress={handleKeyPress}
                       placeholder="Type your message..."
                       className="bg-white/5 border-white/10 text-white placeholder:text-gray-400 text-xs sm:text-sm"
