@@ -15,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -29,17 +28,13 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(
-        "https://arleen-credit-repair-backend.onrender.com/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const res = await fetch("http://localhost:5000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -48,8 +43,8 @@ export default function LoginPage() {
 
       const data = await res.json();
 
-      // Store token and user info
-      // localStorage.setItem("token", data.token);
+      // Store token and user data
+      localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       router.push("/plans");

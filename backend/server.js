@@ -12,15 +12,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://arleen-credits.vercel.app", "http://localhost:3000"],
-    methods: ['GET', 'POST'],
-    credentials: true
+    origin: '*',
+    methods: ['GET', 'POST']
   }
 });
 
 // Middleware
 app.use(cors({
-  origin: ["https://arleen-credits.vercel.app", "http://localhost:3000"],
+  origin: "http://localhost:3000",
   credentials: true
 }));
 app.use(express.json());
@@ -28,14 +27,11 @@ app.use(cookieParser());
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-  cookie: {
-    secure: process.env.NODE_ENV === "production",
-    httpOnly: true,
-    sameSite: 'lax'
-  }
+  saveUninitialized: false
 }));
+app.use(passport.initialize());
+app.use(passport.session());
+require('./config/passport')(passport);
 
 // MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -43,7 +39,8 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error(err));
 
 // Routes
-app.use('/auth', require('./routes/authRoute'));
+const authRoutes = require('./routes/authRoute');
+app.use('/', authRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");

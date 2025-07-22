@@ -68,36 +68,18 @@ export default function RegisterPage() {
     }
 
     if (!formData.agreeToTerms || !formData.agreeToCredit) {
-      alert("Please agree to all terms and conditions");
-      return;
+      alert("Please agree to all terms and conditions")
+      return
     }
-
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("https://arleen-credit-repair-backend.onrender.com/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-        credentials: "include"
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
-
-      alert("Registration successful!");
-      router.push("/login"); // Or wherever you'd like to go
-    } catch (error: any) {
-      alert(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setIsLoading(true)
+    // Simulate registration process
+    setTimeout(() => {
+      localStorage.setItem("isAuthenticated", "true")
+      localStorage.setItem("userEmail", formData.email)
+      router.push("/plans")
+      setIsLoading(false)
+    }, 1500)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800 py-4 sm:py-8 px-4">

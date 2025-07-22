@@ -27,8 +27,8 @@ exports.register = async (req, res) => {
     } = req.body;
 
     if (!email || !password || !firstName || !lastName) {
-      return res.status(400).json({ msg: "Missing required fields" });
-    }
+  return res.status(400).json({ msg: "Missing required fields" });
+}
 
     // Check if email already exists
     const existingUser = await User.findOne({ email });
@@ -86,23 +86,18 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ msg: "Invalid credentials" });
-    }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-
-    res.json({
-      token,
-      user: { id: user._id, username: user.firstName, email: user.email },
-    });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ msg: "Error logging in", error: err.message });
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res.status(401).json({ msg: "Invalid credentials" });
   }
+
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
+
+  res.json({
+    token,
+    user: { id: user._id, username: user.firstName, email: user.email },
+  });
 };
