@@ -58,7 +58,7 @@ exports.register = async (req, res) => {
       token,
       user: {
         id: user._id,
-        username: user.lastName,
+        username: user.firstName,
         email: user.email,
       },
     });
@@ -81,6 +81,6 @@ exports.login = async (req, res) => {
 
   res.json({
     token,
-    user: { id: user._id, username: user.lastName, email: user.email },
+    user: { id: user._id, username: user.firstName, email: user.email },
   });
 };
