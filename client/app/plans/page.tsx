@@ -75,6 +75,8 @@ function PlansPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userFirstName, setUserFirstName] = useState("");
+  
   useEffect(() => {
     const token = searchParams.get("token");
 
@@ -82,7 +84,6 @@ function PlansPageContent() {
       localStorage.setItem("token", token);
       setIsAuthenticated(true);
 
-      // Remove token from URL
       const newSearchParams = new URLSearchParams(searchParams.toString());
       newSearchParams.delete("token");
       router.replace(`/plans?${newSearchParams.toString()}`);
@@ -90,8 +91,12 @@ function PlansPageContent() {
       const existingToken = localStorage.getItem("token");
       setIsAuthenticated(!!existingToken);
     }
-  }, [searchParams, router]);
 
+    const storedName = localStorage.getItem("userFirstName");
+    if (storedName) {
+      setUserFirstName(storedName);
+    }
+  }, [searchParams, router]);
   // useEffect(() => {
   //   const authStatus = localStorage.getItem("isAuthenticated");
   //   if (!authStatus) {
@@ -112,7 +117,6 @@ function PlansPageContent() {
     localStorage.setItem("selectedPlan", JSON.stringify(plan));
     router.push("/chat");
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800">

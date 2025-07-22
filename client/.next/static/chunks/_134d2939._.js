@@ -272,19 +272,23 @@ function PlansPageContent() {
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     const searchParams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"])();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [userFirstName, setUserFirstName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "PlansPageContent.useEffect": ()=>{
             const token = searchParams.get("token");
             if (token) {
                 localStorage.setItem("token", token);
                 setIsAuthenticated(true);
-                // Remove token from URL
                 const newSearchParams = new URLSearchParams(searchParams.toString());
                 newSearchParams.delete("token");
                 router.replace(`/plans?${newSearchParams.toString()}`);
             } else {
                 const existingToken = localStorage.getItem("token");
                 setIsAuthenticated(!!existingToken);
+            }
+            const storedName = localStorage.getItem("userFirstName");
+            if (storedName) {
+                setUserFirstName(storedName);
             }
         }
     }["PlansPageContent.useEffect"], [
@@ -323,7 +327,7 @@ function PlansPageContent() {
                                 children: "Arleen Credit Repair Program"
                             }, void 0, false, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 122,
+                                lineNumber: 126,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -339,19 +343,19 @@ function PlansPageContent() {
                                                     className: "mr-2 h-4 w-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/plans/page.tsx",
-                                                    lineNumber: 132,
+                                                    lineNumber: 136,
                                                     columnNumber: 17
                                                 }, this),
                                                 "Chat with Agent"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/plans/page.tsx",
-                                            lineNumber: 128,
+                                            lineNumber: 132,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 127,
+                                        lineNumber: 131,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -363,20 +367,20 @@ function PlansPageContent() {
                                                 className: "mr-2 h-4 w-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/plans/page.tsx",
-                                                lineNumber: 141,
+                                                lineNumber: 145,
                                                 columnNumber: 15
                                             }, this),
                                             "Logout"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 136,
+                                        lineNumber: 140,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 126,
+                                lineNumber: 130,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -388,24 +392,24 @@ function PlansPageContent() {
                                     className: "h-4 w-4"
                                 }, void 0, false, {
                                     fileName: "[project]/app/plans/page.tsx",
-                                    lineNumber: 153,
+                                    lineNumber: 157,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$menu$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Menu$3e$__["Menu"], {
                                     className: "h-4 w-4"
                                 }, void 0, false, {
                                     fileName: "[project]/app/plans/page.tsx",
-                                    lineNumber: 155,
+                                    lineNumber: 159,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 146,
+                                lineNumber: 150,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/plans/page.tsx",
-                        lineNumber: 121,
+                        lineNumber: 125,
                         columnNumber: 9
                     }, this),
                     isMobileMenuOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -422,19 +426,19 @@ function PlansPageContent() {
                                             className: "mr-2 h-4 w-4"
                                         }, void 0, false, {
                                             fileName: "[project]/app/plans/page.tsx",
-                                            lineNumber: 167,
+                                            lineNumber: 171,
                                             columnNumber: 17
                                         }, this),
                                         "Chat with Agent"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/plans/page.tsx",
-                                    lineNumber: 163,
+                                    lineNumber: 167,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 162,
+                                lineNumber: 166,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -446,26 +450,26 @@ function PlansPageContent() {
                                         className: "mr-2 h-4 w-4"
                                     }, void 0, false, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 176,
+                                        lineNumber: 180,
                                         columnNumber: 15
                                     }, this),
                                     "Logout"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 171,
+                                lineNumber: 175,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/plans/page.tsx",
-                        lineNumber: 161,
+                        lineNumber: 165,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/plans/page.tsx",
-                lineNumber: 120,
+                lineNumber: 124,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -488,12 +492,12 @@ function PlansPageContent() {
                                             className: "rounded-3xl mx-auto w-48 h-48 lg:w-full lg:h-auto object-cover"
                                         }, void 0, false, {
                                             fileName: "[project]/app/plans/page.tsx",
-                                            lineNumber: 189,
+                                            lineNumber: 193,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 188,
+                                        lineNumber: 192,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -501,23 +505,23 @@ function PlansPageContent() {
                                         children: "Arleen Credit Repair"
                                     }, void 0, false, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 197,
+                                        lineNumber: 201,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 187,
+                                lineNumber: 191,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/plans/page.tsx",
-                            lineNumber: 186,
+                            lineNumber: 190,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/plans/page.tsx",
-                        lineNumber: 185,
+                        lineNumber: 189,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -543,7 +547,7 @@ function PlansPageContent() {
                                                             className: "rounded-xl w-20 h-20 object-cover"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/plans/page.tsx",
-                                                            lineNumber: 217,
+                                                            lineNumber: 221,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -554,7 +558,7 @@ function PlansPageContent() {
                                                                     children: plan.title
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/plans/page.tsx",
-                                                                    lineNumber: 225,
+                                                                    lineNumber: 229,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -562,7 +566,7 @@ function PlansPageContent() {
                                                                     children: plan.subtitle
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/plans/page.tsx",
-                                                                    lineNumber: 228,
+                                                                    lineNumber: 232,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -573,7 +577,7 @@ function PlansPageContent() {
                                                                             children: plan.price
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/plans/page.tsx",
-                                                                            lineNumber: 232,
+                                                                            lineNumber: 236,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         plan.originalPrice && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -581,25 +585,25 @@ function PlansPageContent() {
                                                                             children: plan.originalPrice
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/plans/page.tsx",
-                                                                            lineNumber: 236,
+                                                                            lineNumber: 240,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/plans/page.tsx",
-                                                                    lineNumber: 231,
+                                                                    lineNumber: 235,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/plans/page.tsx",
-                                                            lineNumber: 224,
+                                                            lineNumber: 228,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/plans/page.tsx",
-                                                    lineNumber: 216,
+                                                    lineNumber: 220,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -612,49 +616,49 @@ function PlansPageContent() {
                                                     children: plan.buttonText
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/plans/page.tsx",
-                                                    lineNumber: 243,
+                                                    lineNumber: 247,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/plans/page.tsx",
-                                            lineNumber: 215,
+                                            lineNumber: 219,
                                             columnNumber: 19
                                         }, this)
                                     }, plan.id, false, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 210,
+                                        lineNumber: 214,
                                         columnNumber: 17
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 208,
+                                lineNumber: 212,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/plans/page.tsx",
-                            lineNumber: 207,
+                            lineNumber: 211,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/plans/page.tsx",
-                        lineNumber: 206,
+                        lineNumber: 210,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/plans/page.tsx",
-                lineNumber: 183,
+                lineNumber: 187,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/plans/page.tsx",
-        lineNumber: 118,
+        lineNumber: 122,
         columnNumber: 5
     }, this);
 }
-_s(PlansPageContent, "cCpOGQgoYLcrceTPbAPTDGiqfg4=", false, function() {
+_s(PlansPageContent, "tU/ieXCEkX7pGQsQ/v8i0nR3x00=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"],
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"]
@@ -668,17 +672,17 @@ function PlansPage() {
             children: "Loading page..."
         }, void 0, false, {
             fileName: "[project]/app/plans/page.tsx",
-            lineNumber: 269,
+            lineNumber: 273,
             columnNumber: 9
         }, void 0),
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(PlansPageContent, {}, void 0, false, {
             fileName: "[project]/app/plans/page.tsx",
-            lineNumber: 272,
+            lineNumber: 276,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/plans/page.tsx",
-        lineNumber: 267,
+        lineNumber: 271,
         columnNumber: 5
     }, this);
 }
