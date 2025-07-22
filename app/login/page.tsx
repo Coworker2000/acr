@@ -17,7 +17,6 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
-
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,12 +30,13 @@ export default function LoginPage() {
 
     try {
       const res = await fetch(
-        "https://arleen-credit-repair-backend.onrender.com/login",
+        "https://arleen-credit-repair-backend.onrender.com/auth/login",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({ email, password }),
         }
       );
@@ -49,7 +49,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       // Store token and user info
-      localStorage.setItem("token", data.token);
+      // localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       router.push("/plans");
@@ -109,6 +109,7 @@ export default function LoginPage() {
                 />
                 <button
                   type="button"
+                  aria-label="Toggle password visibility"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                 >
@@ -127,7 +128,8 @@ export default function LoginPage() {
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-white to-gray-200 hover:from-gray-100 hover:to-gray-300 text-black text-sm sm:text-base font-semibold"
-              disabled={isLoading}
+              ria-disabled={!email || !password || isLoading}
+              disabled={!email || !password || isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>

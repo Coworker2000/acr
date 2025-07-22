@@ -12,7 +12,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://arleen-credits.vercel.app", "https://localhost:3000"],
+    origin: ["https://arleen-credits.vercel.app", "http://localhost:3000"],
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -20,7 +20,7 @@ const io = new Server(server, {
 
 // Middleware
 app.use(cors({
-  origin: ["https://arleen-credits.vercel.app", "https://localhost:3000"],
+  origin: ["https://arleen-credits.vercel.app", "http://localhost:3000"],
   credentials: true
 }));
 app.use(express.json());
@@ -29,7 +29,12 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI })
+  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    sameSite: 'lax'
+  }
 }));
 
 // MongoDB
@@ -39,8 +44,6 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Routes
 app.use('/auth', require('./routes/authRoute'));
-app.use('/register', require('./routes/registerRoute'));
-app.use('/login', require('./routes/loginRoute'));
 
 app.get("/", (req, res) => {
   res.send("API is running...");

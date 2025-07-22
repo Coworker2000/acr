@@ -75,12 +75,13 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://arleen-credit-repair-backend.onrender.com/api/register", {
+      const response = await fetch("https://arleen-credit-repair-backend.onrender.com/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
+        credentials: "include"
       });
 
       const data = await response.json();
