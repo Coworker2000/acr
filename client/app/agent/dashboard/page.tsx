@@ -135,7 +135,7 @@ export default function AgentDashboard() {
   
   const loadActiveChats = async () => {
     try {
-      const response = await fetch('http://localhost:5000/chat/active', {
+      const response = await fetch('https://arleen-credit-repair-backend.onrender.com/chat/active', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('agentToken')}`
         }
