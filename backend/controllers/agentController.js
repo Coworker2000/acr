@@ -23,7 +23,7 @@ const agentLogin = async (req, res) => {
         username: process.env.AGENT_USERNAME,
         name: process.env.AGENT_NAME
       },
-      process.env.JWT_SECRET || 'fallback-secret',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
