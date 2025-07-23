@@ -159,7 +159,7 @@ export default function AgentDashboard() {
   
   const loadChatHistory = async (chatId: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/chat/history/${chatId}`, {
+      const response = await fetch(`https://arleen-credit-repair-backend.onrender.com/chat/history${chatId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('agentToken')}`
         }

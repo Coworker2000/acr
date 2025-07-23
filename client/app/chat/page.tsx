@@ -76,7 +76,7 @@ export default function ChatPage() {
       
       // Create or get existing chat
       try {
-        const response = await fetch('http://localhost:5000/chat/create', {
+        const response = await fetch('https://arleen-credit-repair-backend.onrender.com/chat/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
