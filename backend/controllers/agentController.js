@@ -1,41 +1,38 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
-
-// Simple agent credentials (in production, this should be in database with hashed passwords)
-const AGENT_CREDENTIALS = {
-  username: 'admin',
-  password: 'agent123',
-  name: 'Credit Repair Agent'
-};
 
 // Agent login
 const agentLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
-    
-    if (username !== AGENT_CREDENTIALS.username || password !== AGENT_CREDENTIALS.password) {
+
+    if (
+      username !== process.env.AGENT_USERNAME ||
+      password !== process.env.AGENT_PASSWORD
+    ) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
-    
+
     // Create JWT token for agent
     const token = jwt.sign(
-      { 
+      {
         type: 'agent',
-        username: AGENT_CREDENTIALS.username,
-        name: AGENT_CREDENTIALS.name
+        username: process.env.AGENT_USERNAME,
+        name: process.env.AGENT_NAME
       },
       process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '24h' }
     );
-    
+
     res.json({
       success: true,
       token,
       agent: {
-        username: AGENT_CREDENTIALS.username,
-        name: AGENT_CREDENTIALS.name
+        username: process.env.AGENT_USERNAME,
+        name: process.env.AGENT_NAME
       }
     });
   } catch (error) {
@@ -51,23 +48,23 @@ const agentLogin = async (req, res) => {
 const verifyAgent = (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    
+
     if (!token) {
       return res.status(401).json({
         success: false,
         message: 'No token provided'
       });
     }
-    
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
-    
+
     if (decoded.type !== 'agent') {
       return res.status(401).json({
         success: false,
         message: 'Invalid token type'
       });
     }
-    
+
     req.agent = decoded;
     next();
   } catch (error) {
