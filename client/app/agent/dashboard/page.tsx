@@ -19,6 +19,13 @@ import {
   Clock,
   X,
   Minimize2,
+  ArrowLeft,
+  Menu,
+  Search,
+  MoreVertical,
+  Phone,
+  Video,
+  Settings,
 } from "lucide-react";
 import SocketService from "@/lib/socket";
 
@@ -59,6 +66,7 @@ export default function AgentDashboard() {
   const [isConnected, setIsConnected] = useState(false);
   const [userTyping, setUserTyping] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketService = SocketService.getInstance();
@@ -325,9 +333,37 @@ export default function AgentDashboard() {
         </div>
       </div>
 
-      <div className="flex h-[calc(100vh-80px)]">
+      <div className="flex h-[calc(100vh-80px)] relative">
+        {/* Mobile Sidebar Toggle */}
+        <Button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="lg:hidden fixed top-20 left-4 z-50 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20"
+          size="sm"
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
+
         {/* Chat List Sidebar */}
-        <div className="w-80 bg-white/5 backdrop-blur-md border-r border-white/10">
+        <div className={`
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0
+          fixed lg:relative z-40
+          w-80 h-full
+          bg-white/5 backdrop-blur-md border-r border-white/10
+          transition-transform duration-300 ease-in-out
+        `}>
+          {/* Mobile close button */}
+          <div className="lg:hidden absolute top-4 right-4">
+            <Button
+              onClick={() => setIsSidebarOpen(false)}
+              variant="outline"
+              size="sm"
+              className="text-white border-white/20 hover:bg-white/10 bg-transparent"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
           <div className="p-4 border-b border-white/10">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-white">Active Chats</h2>
@@ -349,21 +385,24 @@ export default function AgentDashboard() {
               {chats.map((chat) => (
                 <Card
                   key={chat.chatId}
-                  className={`w-[300px] mb-2 cursor-pointer transition-colors overflow-hidden ${
+                  className={`mb-2 cursor-pointer transition-colors overflow-hidden ${
                     selectedChat?.chatId === chat.chatId
                       ? "bg-white/20 border-white/30"
                       : "bg-white/5 hover:bg-white/10 border-white/10"
                   }`}
-                  onClick={() => selectChat(chat)}
+                  onClick={() => {
+                    selectChat(chat);
+                    // Close sidebar on mobile after selecting chat
+                    if (window.innerWidth < 1024) {
+                      setIsSidebarOpen(false);
+                    }
+                  }}
                 >
                   <CardContent className="p-3">
                     <div className="flex items-start justify-between">
                       {/* Left Side */}
-                      <div className="flex flex-col space-y-1 max-w-[200px]">
-                        {/* <h3 className="text-white font-medium text-sm truncate">
-                          {chat.userName}
-                        </h3> */}
-                        <p className="text-gray-300 text-xs truncate">
+                      <div className="flex flex-col space-y-1 max-w-[200px] sm:max-w-[180px]">
+                        <p className="text-gray-300 text-xs truncate font-medium">
                           {chat.userEmail}
                         </p>
 
@@ -395,7 +434,8 @@ export default function AgentDashboard() {
                         </Badge>
                         <div className="flex items-center space-x-1 text-xs text-gray-400">
                           <Clock className="h-3 w-3" />
-                          <span>{chat.lastActivity.toLocaleTimeString()}</span>
+                          <span className="hidden sm:inline">{chat.lastActivity.toLocaleTimeString()}</span>
+                          <span className="sm:hidden">{chat.lastActivity.toLocaleTimeString([], {timeStyle: 'short'})}</span>
                         </div>
                       </div>
                     </div>
@@ -406,12 +446,20 @@ export default function AgentDashboard() {
               {chats.length === 0 && (
                 <div className="text-center text-gray-400 py-8">
                   <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No active chats</p>
+                  <p className="text-sm">No active chats</p>
                 </div>
               )}
             </div>
           </ScrollArea>
         </div>
+
+        {/* Overlay for mobile */}
+        {isSidebarOpen && (
+          <div 
+            className="lg:hidden fixed inset-0 bg-black/50 z-30"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
 
         {/* Chat Interface */}
         <div className="flex-1 flex flex-col">
