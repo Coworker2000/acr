@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { MessageCircle, LogOut, Menu, X } from "lucide-react";
+import { getValidatedToken } from "../../lib/auth-utils";
 
 interface Plan {
   id: string;
@@ -116,10 +117,36 @@ function PlansPageContent() {
     router.push("/login");
   };
 
-  const handlePlanSelect = (plan: Plan) => {
-    setSelectedPlan(plan);
-    localStorage.setItem("selectedPlan", JSON.stringify(plan));
-    router.push("/chat");
+  const handlePlanSelect = async (plan: Plan) => {
+    try {
+      // Validate token before navigation
+      const validatedToken = getValidatedToken();
+      
+      if (!validatedToken) {
+        // Token is invalid or missing, clear auth data and redirect to login
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("isAuthenticated");
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userFirstName");
+        router.push("/login");
+        return;
+      }
+      
+      // Token is valid, proceed with plan selection
+      setSelectedPlan(plan);
+      localStorage.setItem("selectedPlan", JSON.stringify(plan));
+      router.push("/chat");
+    } catch (error) {
+      console.error("Token validation failed:", error);
+      // Clear auth data and redirect to login on validation error
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("isAuthenticated");
+      localStorage.removeItem("userEmail");
+      localStorage.removeItem("userFirstName");
+      router.push("/login");
+    }
   };
 
   return (

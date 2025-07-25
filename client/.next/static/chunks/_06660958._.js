@@ -1,4 +1,4 @@
-(globalThis.TURBOPACK = globalThis.TURBOPACK || []).push(["static/chunks/_134d2939._.js", {
+(globalThis.TURBOPACK = globalThis.TURBOPACK || []).push(["static/chunks/_06660958._.js", {
 
 "[project]/lib/utils.ts [app-client] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
@@ -189,6 +189,141 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
 }
 }}),
+"[project]/lib/auth-utils.ts [app-client] (ecmascript)": ((__turbopack_context__) => {
+"use strict";
+
+var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
+{
+__turbopack_context__.s({
+    "getValidatedToken": (()=>getValidatedToken),
+    "isTokenExpired": (()=>isTokenExpired),
+    "validateToken": (()=>validateToken)
+});
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jwt$2d$decode$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/jwt-decode/build/esm/index.js [app-client] (ecmascript)");
+;
+function validateToken(token) {
+    try {
+        if (!token) {
+            return {
+                isValid: false,
+                error: "No token provided"
+            };
+        }
+        const decoded = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jwt$2d$decode$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jwtDecode"])(token);
+        // Check if token is expired first
+        if (decoded.exp && decoded.exp < Date.now() / 1000) {
+            return {
+                isValid: false,
+                error: "Token has expired. Please login again."
+            };
+        }
+        // Extract email with fallbacks
+        const email = decoded.email || decoded.userEmail;
+        // Extract userName with fallbacks
+        const userName = decoded.userName || decoded.username || decoded.firstName;
+        const debugInfo = {
+            tokenKeys: Object.keys(decoded),
+            tokenFields: {
+                hasId: !!decoded.id,
+                hasUserId: !!decoded.userId,
+                hasEmail: !!decoded.email,
+                hasUserEmail: !!decoded.userEmail,
+                hasUserName: !!decoded.userName,
+                hasUsername: !!decoded.username,
+                hasFirstName: !!decoded.firstName
+            },
+            extractedValues: {
+                email: {
+                    value: email,
+                    source: decoded.email ? 'email' : decoded.userEmail ? 'userEmail' : 'none'
+                },
+                userName: {
+                    value: userName,
+                    source: decoded.userName ? 'userName' : decoded.username ? 'username' : decoded.firstName ? 'firstName' : 'none'
+                }
+            },
+            rawDecoded: decoded,
+            isLegacyToken: !email || !userName
+        };
+        // Handle legacy tokens from older backend versions
+        if (!email || !userName) {
+            // Check if we have user data in localStorage as fallback
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    const fallbackEmail = email || userData.email;
+                    const fallbackUserName = userName || userData.username || userData.firstName || userData.name;
+                    if (fallbackEmail && fallbackUserName) {
+                        console.warn('Using fallback user data from localStorage for legacy token');
+                        return {
+                            isValid: true,
+                            email: fallbackEmail,
+                            userName: fallbackUserName,
+                            debugInfo: {
+                                ...debugInfo,
+                                usedFallback: true,
+                                fallbackSource: 'localStorage'
+                            }
+                        };
+                    }
+                } catch (e) {
+                    console.error('Failed to parse stored user data:', e);
+                }
+            }
+            // If no fallback available, return error with helpful message
+            const missingFields = [];
+            if (!email) missingFields.push('email');
+            if (!userName) missingFields.push('userName');
+            return {
+                isValid: false,
+                error: `Your session is using an older token format. Please log out and log in again to update your authentication.`,
+                debugInfo
+            };
+        }
+        return {
+            isValid: true,
+            email,
+            userName,
+            debugInfo
+        };
+    } catch (error) {
+        return {
+            isValid: false,
+            error: `Token decode error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        };
+    }
+}
+function isTokenExpired(token) {
+    try {
+        const decoded = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jwt$2d$decode$2f$build$2f$esm$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jwtDecode"])(token);
+        if (!decoded.exp) return false;
+        const currentTime = Date.now() / 1000;
+        return decoded.exp < currentTime;
+    } catch  {
+        return true;
+    }
+}
+function getValidatedToken() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        return {
+            isValid: false,
+            error: "No token found in localStorage"
+        };
+    }
+    if (isTokenExpired(token)) {
+        return {
+            isValid: false,
+            error: "Token has expired"
+        };
+    }
+    return validateToken(token);
+}
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
+}
+}}),
 "[project]/app/plans/page.tsx [app-client] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
 
@@ -209,9 +344,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$log$2d$out$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LogOut$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/log-out.js [app-client] (ecmascript) <export default as LogOut>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$menu$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Menu$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/menu.js [app-client] (ecmascript) <export default as Menu>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/x.js [app-client] (ecmascript) <export default as X>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/auth-utils.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
+;
 ;
 ;
 ;
@@ -312,10 +449,34 @@ function PlansPageContent() {
         localStorage.removeItem("selectedPlan");
         router.push("/login");
     };
-    const handlePlanSelect = (plan)=>{
-        setSelectedPlan(plan);
-        localStorage.setItem("selectedPlan", JSON.stringify(plan));
-        router.push("/chat");
+    const handlePlanSelect = async (plan)=>{
+        try {
+            // Validate token before navigation
+            const validatedToken = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$auth$2d$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getValidatedToken"])();
+            if (!validatedToken) {
+                // Token is invalid or missing, clear auth data and redirect to login
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                localStorage.removeItem("isAuthenticated");
+                localStorage.removeItem("userEmail");
+                localStorage.removeItem("userFirstName");
+                router.push("/login");
+                return;
+            }
+            // Token is valid, proceed with plan selection
+            setSelectedPlan(plan);
+            localStorage.setItem("selectedPlan", JSON.stringify(plan));
+            router.push("/chat");
+        } catch (error) {
+            console.error("Token validation failed:", error);
+            // Clear auth data and redirect to login on validation error
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            localStorage.removeItem("isAuthenticated");
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("userFirstName");
+            router.push("/login");
+        }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800",
@@ -331,7 +492,7 @@ function PlansPageContent() {
                                 children: "Arleen Credit Repair Program"
                             }, void 0, false, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 131,
+                                lineNumber: 157,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -347,19 +508,19 @@ function PlansPageContent() {
                                                     className: "mr-2 h-4 w-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/plans/page.tsx",
-                                                    lineNumber: 141,
+                                                    lineNumber: 167,
                                                     columnNumber: 17
                                                 }, this),
                                                 "Chat with Agent"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/plans/page.tsx",
-                                            lineNumber: 137,
+                                            lineNumber: 163,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 136,
+                                        lineNumber: 162,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -371,20 +532,20 @@ function PlansPageContent() {
                                                 className: "mr-2 h-4 w-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/plans/page.tsx",
-                                                lineNumber: 150,
+                                                lineNumber: 176,
                                                 columnNumber: 15
                                             }, this),
                                             "Logout"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 145,
+                                        lineNumber: 171,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 135,
+                                lineNumber: 161,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -396,24 +557,24 @@ function PlansPageContent() {
                                     className: "h-4 w-4"
                                 }, void 0, false, {
                                     fileName: "[project]/app/plans/page.tsx",
-                                    lineNumber: 162,
+                                    lineNumber: 188,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$menu$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Menu$3e$__["Menu"], {
                                     className: "h-4 w-4"
                                 }, void 0, false, {
                                     fileName: "[project]/app/plans/page.tsx",
-                                    lineNumber: 164,
+                                    lineNumber: 190,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 155,
+                                lineNumber: 181,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/plans/page.tsx",
-                        lineNumber: 130,
+                        lineNumber: 156,
                         columnNumber: 9
                     }, this),
                     isMobileMenuOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -430,19 +591,19 @@ function PlansPageContent() {
                                             className: "mr-2 h-4 w-4"
                                         }, void 0, false, {
                                             fileName: "[project]/app/plans/page.tsx",
-                                            lineNumber: 176,
+                                            lineNumber: 202,
                                             columnNumber: 17
                                         }, this),
                                         "Chat with Agent"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/plans/page.tsx",
-                                    lineNumber: 172,
+                                    lineNumber: 198,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 171,
+                                lineNumber: 197,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -454,26 +615,26 @@ function PlansPageContent() {
                                         className: "mr-2 h-4 w-4"
                                     }, void 0, false, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 185,
+                                        lineNumber: 211,
                                         columnNumber: 15
                                     }, this),
                                     "Logout"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 180,
+                                lineNumber: 206,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/plans/page.tsx",
-                        lineNumber: 170,
+                        lineNumber: 196,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/plans/page.tsx",
-                lineNumber: 129,
+                lineNumber: 155,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -496,12 +657,12 @@ function PlansPageContent() {
                                             className: "rounded-3xl mx-auto w-48 h-48 lg:w-full lg:h-auto object-cover"
                                         }, void 0, false, {
                                             fileName: "[project]/app/plans/page.tsx",
-                                            lineNumber: 198,
+                                            lineNumber: 224,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 197,
+                                        lineNumber: 223,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -509,23 +670,23 @@ function PlansPageContent() {
                                         children: "Arleen Credit Repair"
                                     }, void 0, false, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 206,
+                                        lineNumber: 232,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 196,
+                                lineNumber: 222,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/plans/page.tsx",
-                            lineNumber: 195,
+                            lineNumber: 221,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/plans/page.tsx",
-                        lineNumber: 194,
+                        lineNumber: 220,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -551,7 +712,7 @@ function PlansPageContent() {
                                                             className: "rounded-xl w-20 h-20 object-cover"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/plans/page.tsx",
-                                                            lineNumber: 226,
+                                                            lineNumber: 252,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -562,7 +723,7 @@ function PlansPageContent() {
                                                                     children: plan.title
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/plans/page.tsx",
-                                                                    lineNumber: 234,
+                                                                    lineNumber: 260,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -570,7 +731,7 @@ function PlansPageContent() {
                                                                     children: plan.subtitle
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/plans/page.tsx",
-                                                                    lineNumber: 237,
+                                                                    lineNumber: 263,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -581,7 +742,7 @@ function PlansPageContent() {
                                                                             children: plan.price
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/plans/page.tsx",
-                                                                            lineNumber: 241,
+                                                                            lineNumber: 267,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         plan.originalPrice && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -589,25 +750,25 @@ function PlansPageContent() {
                                                                             children: plan.originalPrice
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/plans/page.tsx",
-                                                                            lineNumber: 245,
+                                                                            lineNumber: 271,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/plans/page.tsx",
-                                                                    lineNumber: 240,
+                                                                    lineNumber: 266,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/plans/page.tsx",
-                                                            lineNumber: 233,
+                                                            lineNumber: 259,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/plans/page.tsx",
-                                                    lineNumber: 225,
+                                                    lineNumber: 251,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -620,45 +781,45 @@ function PlansPageContent() {
                                                     children: plan.buttonText
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/plans/page.tsx",
-                                                    lineNumber: 252,
+                                                    lineNumber: 278,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/plans/page.tsx",
-                                            lineNumber: 224,
+                                            lineNumber: 250,
                                             columnNumber: 19
                                         }, this)
                                     }, plan.id, false, {
                                         fileName: "[project]/app/plans/page.tsx",
-                                        lineNumber: 219,
+                                        lineNumber: 245,
                                         columnNumber: 17
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/app/plans/page.tsx",
-                                lineNumber: 217,
+                                lineNumber: 243,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/plans/page.tsx",
-                            lineNumber: 216,
+                            lineNumber: 242,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/plans/page.tsx",
-                        lineNumber: 215,
+                        lineNumber: 241,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/plans/page.tsx",
-                lineNumber: 192,
+                lineNumber: 218,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/plans/page.tsx",
-        lineNumber: 127,
+        lineNumber: 153,
         columnNumber: 5
     }, this);
 }
@@ -676,17 +837,17 @@ function PlansPage() {
             children: "Loading page..."
         }, void 0, false, {
             fileName: "[project]/app/plans/page.tsx",
-            lineNumber: 278,
+            lineNumber: 304,
             columnNumber: 9
         }, void 0),
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(PlansPageContent, {}, void 0, false, {
             fileName: "[project]/app/plans/page.tsx",
-            lineNumber: 281,
+            lineNumber: 307,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/app/plans/page.tsx",
-        lineNumber: 276,
+        lineNumber: 302,
         columnNumber: 5
     }, this);
 }
@@ -700,4 +861,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }}),
 }]);
 
-//# sourceMappingURL=_134d2939._.js.map
+//# sourceMappingURL=_06660958._.js.map

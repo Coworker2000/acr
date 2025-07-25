@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { Send, ArrowLeft, User, Bot, Wifi, WifiOff } from "lucide-react";
+import { Send, ArrowLeft, User, Bot, Wifi, WifiOff, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import SocketService from "@/lib/socket";
 import { jwtDecode } from "jwt-decode";
@@ -45,6 +45,7 @@ export default function ChatPage() {
   const [chatId, setChatId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [showPlanDetails, setShowPlanDetails] = useState(false);
   const router = useRouter();
   const chatEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -331,49 +332,105 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-800">
       {/* Navigation */}
-      <nav className="bg-white/5 backdrop-blur-md border-b border-white/10 p-4">
+      <nav className="bg-white/5 backdrop-blur-md border-b border-white/10 p-3 md:p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2 sm:space-x-4">
             <Link href="/plans">
               <Button
                 variant="outline"
                 size="sm"
-                className="text-white border-white/20 hover:bg-white/10 bg-transparent text-xs sm:text-sm"
+                className="text-white border-white/20 hover:bg-white/10 bg-transparent text-xs sm:text-sm p-2"
               >
-                <ArrowLeft className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Back to Plans</span>
-                <span className="sm:hidden">Back</span>
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline ml-2">Back to Plans</span>
               </Button>
             </Link>
-            <h1 className="text-lg font-bold text-white">Chat with Agent</h1>
+            <h1 className="text-base sm:text-lg font-bold text-white">Chat with Agent</h1>
+          </div>
+          {/* Connection Status */}
+          <div className="flex items-center space-x-2">
+            {isConnected ? (
+              <Wifi className="h-4 w-4 text-green-400" />
+            ) : (
+              <WifiOff className="h-4 w-4 text-red-400" />
+            )}
+            <span className="text-xs text-gray-300 hidden sm:inline">
+              {isConnected ? 'Connected' : 'Disconnected'}
+            </span>
           </div>
         </div>
       </nav>
-      <div className="max-w-4xl mx-auto p-4 sm:p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Selected Plan Info */}
-          {selectedPlan && (
-            <div className="lg:col-span-1 order-2 lg:order-1">
-              <Card className="bg-white/5 backdrop-blur-md border border-white/10 text-white">
-                <CardHeader>
-                  <CardTitle className="text-base sm:text-lg">
-                    Selected Plan
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <h3 className="font-bold mb-2 text-sm sm:text-base">
+      <div className="flex flex-col h-[calc(100vh-80px)] max-w-4xl mx-auto">
+        {/* Selected Plan Info - Collapsible on Mobile */}
+        {selectedPlan && (
+          <div className="lg:hidden">
+            <div className="mx-3 mb-2">
+              <button
+                onClick={() => setShowPlanDetails(!showPlanDetails)}
+                className="w-full bg-white/5 backdrop-blur-md border border-white/10 text-white p-3 rounded-lg flex items-center justify-between"
+              >
+                <div className="flex items-center space-x-3">
+                  <div>
+                    <span className="font-semibold text-sm">{selectedPlan.title}</span>
+                    <span className="text-white/80 ml-2 text-sm font-bold">{selectedPlan.price}</span>
+                  </div>
+                </div>
+                {showPlanDetails ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </button>
+              {showPlanDetails && (
+                <div className="mt-2 bg-white/5 backdrop-blur-md border border-white/10 text-white p-4 rounded-lg">
+                  <h3 className="font-bold mb-2 text-base">
                     {selectedPlan.title}
                   </h3>
-                  <p className="text-gray-300 text-xs sm:text-sm mb-2">
+                  <p className="text-gray-300 text-sm mb-3">
                     {selectedPlan.subtitle}
                   </p>
                   {selectedPlan.price && (
                     <div className="flex items-center space-x-2">
-                      <span className="text-lg sm:text-xl font-bold text-white">
+                      <span className="text-xl font-bold text-white">
                         {selectedPlan.price}
                       </span>
                       {selectedPlan.originalPrice && (
-                        <span className="text-xs sm:text-sm text-gray-400 line-through">
+                        <span className="text-sm text-gray-400 line-through">
+                          {selectedPlan.originalPrice}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        
+        <div className="flex-1 flex lg:grid lg:grid-cols-3 lg:gap-6 p-3 lg:p-6">
+          {/* Selected Plan Info - Desktop */}
+          {selectedPlan && (
+            <div className="hidden lg:block lg:col-span-1">
+              <Card className="bg-white/5 backdrop-blur-md border border-white/10 text-white">
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    Selected Plan
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <h3 className="font-bold mb-2 text-base">
+                    {selectedPlan.title}
+                  </h3>
+                  <p className="text-gray-300 text-sm mb-2">
+                    {selectedPlan.subtitle}
+                  </p>
+                  {selectedPlan.price && (
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xl font-bold text-white">
+                        {selectedPlan.price}
+                      </span>
+                      {selectedPlan.originalPrice && (
+                        <span className="text-sm text-gray-400 line-through">
                           {selectedPlan.originalPrice}
                         </span>
                       )}
@@ -385,24 +442,32 @@ export default function ChatPage() {
           )}
           {/* Chat Interface */}
           <div
-            className={`${
+            className={`flex-1 flex flex-col ${
               selectedPlan ? "lg:col-span-2" : "lg:col-span-3"
-            } order-1 lg:order-2`}
+            }`}
           >
-            <Card className="bg-white/5 backdrop-blur-md border border-white/10 text-white">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center text-base sm:text-lg">
-                  <Bot className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                  Credit Repair Agent
+            <Card className="bg-white/5 backdrop-blur-md border border-white/10 text-white flex-1 flex flex-col">
+              <CardHeader className="pb-3 px-4 py-3">
+                <CardTitle className="flex items-center justify-between text-base sm:text-lg">
+                  <div className="flex items-center">
+                    <Bot className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                    <span>Credit Repair Agent</span>
+                    {agentOnline && (
+                      <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-500/20 text-green-400">
+                        <div className="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></div>
+                        Online
+                      </span>
+                    )}
+                  </div>
                 </CardTitle>
               </CardHeader>
-              {/* Fixed height container for chat */}
-              <div className="h-[500px] sm:h-[600px] flex flex-col">
+              {/* Flexible height container for chat */}
+              <div className="flex-1 flex flex-col min-h-0">
                 {/* Messages area - takes up remaining space */}
-                <div className="flex-1 px-6 overflow-hidden">
+                <div className="flex-1 px-3 sm:px-6 overflow-hidden">
                   <div
                     ref={messagesContainerRef}
-                    className="h-full overflow-y-auto space-y-3 sm:space-y-4 pr-2"
+                    className="h-full overflow-y-auto space-y-2 sm:space-y-3 pr-1 sm:pr-2 pb-2"
                     style={{
                       scrollbarWidth: "thin",
                       scrollbarColor: "rgba(255, 255, 255, 0.3) transparent",
@@ -411,51 +476,52 @@ export default function ChatPage() {
                     {messages.map((message, index) => (
                       <div
                         key={message._id || index}
-                        className={`flex ${
+                        className={`flex mb-3 ${
                           message.sender === "user"
                             ? "justify-end"
                             : "justify-start"
                         }`}
                       >
                         <div
-                          className={`max-w-[85%] sm:max-w-[80%] p-2 sm:p-3 rounded-lg ${
+                          className={`max-w-[90%] sm:max-w-[85%] md:max-w-[80%] rounded-2xl shadow-sm ${
                             message.sender === "user"
-                              ? "bg-white/10 text-white"
-                              : "bg-gray-700 text-white"
+                              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white ml-8 rounded-br-md"
+                              : "bg-white/10 text-white mr-8 rounded-bl-md"
                           }`}
                         >
-                          <div className="flex items-start space-x-2">
-                            {message.sender === "agent" && (
-                              <Bot className="h-3 w-3 sm:h-4 sm:w-4 mt-1 flex-shrink-0" />
-                            )}
-                            {message.sender === "user" && (
-                              <User className="h-3 w-3 sm:h-4 sm:w-4 mt-1 flex-shrink-0" />
-                            )}
-                            <div className="min-w-0">
-                              <p className="text-xs sm:text-sm break-words">
-                                {message.text}
-                              </p>
-                              <p className="text-xs opacity-70 mt-1">
-                                {message.timestamp.toLocaleTimeString()}
-                              </p>
+                          {message.sender === "agent" && (
+                            <div className="flex items-center space-x-2 px-3 pt-2 pb-1">
+                              <Bot className="h-4 w-4 text-blue-400 flex-shrink-0" />
+                              <span className="text-xs text-blue-400 font-medium">Agent</span>
                             </div>
+                          )}
+                          <div className={`px-3 ${message.sender === "agent" ? "pb-3" : "py-3"}`}>
+                            <p className="text-sm sm:text-base break-words leading-relaxed">
+                              {message.text}
+                            </p>
+                            <p className={`text-xs mt-2 ${
+                              message.sender === "user" ? "text-blue-100" : "text-gray-400"
+                            }`}>
+                              {message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            </p>
                           </div>
                         </div>
                       </div>
                     ))}
-                    {isTyping && (
-                      <div className="flex justify-start">
-                        <div className="bg-gray-700 text-white p-2 sm:p-3 rounded-lg">
+                    {(isTyping || agentTyping) && (
+                      <div className="flex justify-start mb-3">
+                        <div className="bg-white/10 text-white rounded-2xl rounded-bl-md mr-8 px-3 py-3">
                           <div className="flex items-center space-x-2">
-                            <Bot className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <div className="flex space-x-1">
-                              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <Bot className="h-4 w-4 text-blue-400" />
+                            <span className="text-xs text-blue-400 font-medium">Agent is typing</span>
+                            <div className="flex space-x-1 ml-2">
+                              <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
                               <div
-                                className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce"
+                                className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
                                 style={{ animationDelay: "0.1s" }}
                               ></div>
                               <div
-                                className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-400 rounded-full animate-bounce"
+                                className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
                                 style={{ animationDelay: "0.2s" }}
                               ></div>
                             </div>
@@ -467,23 +533,30 @@ export default function ChatPage() {
                   </div>
                 </div>
                 {/* Fixed input area at bottom */}
-                <div className="border-t border-white/10 p-4 bg-white/5">
-                  <div className="flex space-x-2">
-                    <Input
-                      value={newMessage}
-                      onChange={handleInputChange}
-                      onKeyDown={handleKeyDown}
-                      placeholder="Type your message..."
-                      className="bg-white/5 border-white/10 text-white placeholder:text-gray-400 text-xs sm:text-sm"
-                    />
+                <div className="border-t border-white/10 bg-white/5 p-3 sm:p-4">
+                  <div className="flex items-end space-x-2">
+                    <div className="flex-1">
+                      <Input
+                        value={newMessage}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Type your message..."
+                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 text-sm rounded-full px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
                     <Button
                       onClick={handleSendMessage}
-                      className="bg-gradient-to-r from-white to-gray-200 hover:from-gray-100 hover:to-gray-300 text-black px-3 sm:px-4 font-semibold"
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full p-3 min-w-[48px] h-12 flex items-center justify-center"
                       disabled={!newMessage.trim()}
                     >
-                      <Send className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <Send className="h-5 w-5" />
                     </Button>
                   </div>
+                  {(isConnected && agentOnline) && (
+                    <p className="text-xs text-gray-400 mt-2 text-center">
+                      Agent is online • Messages are delivered instantly
+                    </p>
+                  )}
                 </div>
               </div>
             </Card>
