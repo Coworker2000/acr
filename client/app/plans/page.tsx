@@ -107,9 +107,13 @@ function PlansPageContent() {
   // }, [router]);
 
   const handleLogout = () => {
+    // Clear all authentication data
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("userEmail");
-    router.push("/");
+    localStorage.removeItem("selectedPlan");
+    router.push("/login");
   };
 
   const handlePlanSelect = (plan: Plan) => {

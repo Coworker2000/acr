@@ -87,7 +87,7 @@ export default function RegisterPage() {
 
       // Save auth token or user info locally if needed
       localStorage.setItem("token", data.token);
-      localStorage.setItem("userEmail", data.user.email);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       router.push("/plans");
     } catch (error) {

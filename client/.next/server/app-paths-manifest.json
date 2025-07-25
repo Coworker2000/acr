@@ -2,6 +2,9 @@
   "/agent/dashboard/page": "app/agent/dashboard/page.js",
   "/agent/login/page": "app/agent/login/page.js",
   "/chat/page": "app/chat/page.js",
+  "/debug-token/page": "app/debug-token/page.js",
+  "/login/page": "app/login/page.js",
   "/page": "app/page.js",
-  "/plans/page": "app/plans/page.js"
+  "/plans/page": "app/plans/page.js",
+  "/register/page": "app/register/page.js"
 }

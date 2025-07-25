@@ -54,36 +54,104 @@ app.get("/", (req, res) => {
 // Import Chat model for socket operations
 const Chat = require('./models/Chat');
 
-// Socket.io enhanced chat functionality
-io.on('connection', (socket) => {
-  console.log(`User connected: ${socket.id}`);
+// Import JWT for socket authentication
+const jwt = require('jsonwebtoken');
 
-  // Join a specific chat room
-  socket.on('join_chat', (data) => {
-    const { chatId, userType } = data; // userType: 'user' or 'agent'
-    socket.join(chatId);
-    console.log(`${userType} joined chat: ${chatId}`);
+// Socket authentication middleware
+const socketAuth = (socket, next) => {
+  const token = socket.handshake.auth.token;
+  if (!token) {
+    return next(new Error('Authentication required'));
+  }
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Use the correct field names from JWT payload
+    socket.userId = decoded.id || decoded.userId;
+    socket.userEmail = decoded.email || decoded.userEmail || (decoded.username + '@system');
+    socket.userName = decoded.userName || decoded.name;
+    socket.isAgent = decoded.role === 'agent' || decoded.type === 'agent';
     
-    // Update agent online status if agent joins
-    if (userType === 'agent') {
-      Chat.findOneAndUpdate(
-        { chatId },
-        { isAgentOnline: true },
-        { new: true }
-      ).then(() => {
-        socket.to(chatId).emit('agent_status', { isOnline: true });
-      });
+    console.log('Socket auth - decoded JWT:', {
+      id: decoded.id,
+      userId: decoded.userId,
+      email: decoded.email,
+      userEmail: decoded.userEmail,
+      userName: decoded.userName,
+      name: decoded.name,
+      role: decoded.role,
+      type: decoded.type
+    });
+    
+    next();
+  } catch (error) {
+    console.error('Socket authentication error:', error);
+    next(new Error('Invalid token'));
+  }
+};
+
+// Apply authentication middleware
+io.use(socketAuth);
+
+// Socket.io enhanced chat functionality with authentication
+io.on('connection', (socket) => {
+  console.log(`User connected: ${socket.id}, userId: ${socket.userId}`);
+
+  // Join a specific chat room with ownership verification
+  socket.on('join_chat', async (data) => {
+    try {
+      const { chatId, userType } = data; // userType: 'user' or 'agent'
+      
+      // Verify chat ownership for regular users
+      if (userType === 'user') {
+        const chat = await Chat.findOne({ 
+          chatId, 
+          userId: socket.userId  // Verify user owns this chat
+        });
+        
+        if (!chat) {
+          socket.emit('error', { message: 'Chat not found or access denied' });
+          return;
+        }
+      }
+      
+      socket.join(chatId);
+      console.log(`${userType} (${socket.userId}) joined chat: ${chatId}`);
+      
+      // Update agent online status if agent joins
+      if (userType === 'agent') {
+        Chat.findOneAndUpdate(
+          { chatId },
+          { isAgentOnline: true },
+          { new: true }
+        ).then(() => {
+          socket.to(chatId).emit('agent_status', { isOnline: true });
+        });
+      }
+    } catch (error) {
+      console.error('Error joining chat:', error);
+      socket.emit('error', { message: 'Failed to join chat' });
     }
   });
 
-  // Handle real-time messages
+  // Handle real-time messages with ownership verification
   socket.on('send_message', async (data) => {
     try {
       const { chatId, text, sender, senderName } = data;
       
-      // Save message to database
-      const chat = await Chat.findOne({ chatId });
-      if (chat) {
+      // Verify message sending permissions
+      if (sender === 'user') {
+        // Regular users can only send messages to their own chats
+        const chat = await Chat.findOne({ 
+          chatId, 
+          userId: socket.userId  // Verify user owns this chat
+        });
+        
+        if (!chat) {
+          socket.emit('message_error', { error: 'Chat not found or access denied' });
+          return;
+        }
+        
         const message = {
           text,
           sender,
@@ -107,6 +175,36 @@ io.on('connection', (socket) => {
           lastMessage: message,
           sender
         });
+      } else if (sender === 'agent' && socket.isAgent) {
+        // Agents can send messages to any chat
+        const chat = await Chat.findOne({ chatId });
+        if (chat) {
+          const message = {
+            text,
+            sender,
+            timestamp: new Date()
+          };
+          
+          await chat.addMessage(message);
+          
+          // Emit to all users in the chat room
+          io.to(chatId).emit('receive_message', {
+            ...message,
+            senderName,
+            chatId
+          });
+          
+          // Update agent dashboard with new message notification
+          io.emit('new_message_notification', {
+            chatId,
+            userName: chat.userName,
+            userEmail: chat.userEmail,
+            lastMessage: message,
+            sender
+          });
+        }
+      } else {
+        socket.emit('message_error', { error: 'Unauthorized to send message' });
       }
     } catch (error) {
       console.error('Error handling message:', error);
@@ -114,45 +212,86 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle typing indicators
-  socket.on('typing_start', (data) => {
-    const { chatId, userType } = data;
-    socket.to(chatId).emit('user_typing', { userType, isTyping: true });
-    
-    if (userType === 'agent') {
-      Chat.findOneAndUpdate(
-        { chatId },
-        { agentTyping: true }
-      ).exec();
+  // Handle typing indicators with ownership verification
+  socket.on('typing_start', async (data) => {
+    try {
+      const { chatId, userType } = data;
+      
+      // Verify user can access this chat
+      if (userType === 'user') {
+        const chat = await Chat.findOne({ 
+          chatId, 
+          userId: socket.userId 
+        });
+        if (!chat) return;
+      }
+      
+      socket.to(chatId).emit('user_typing', { userType, isTyping: true });
+      
+      if (userType === 'agent') {
+        Chat.findOneAndUpdate(
+          { chatId },
+          { agentTyping: true }
+        ).exec();
+      }
+    } catch (error) {
+      console.error('Error handling typing start:', error);
     }
   });
 
-  socket.on('typing_stop', (data) => {
-    const { chatId, userType } = data;
-    socket.to(chatId).emit('user_typing', { userType, isTyping: false });
-    
-    if (userType === 'agent') {
-      Chat.findOneAndUpdate(
-        { chatId },
-        { agentTyping: false }
-      ).exec();
+  socket.on('typing_stop', async (data) => {
+    try {
+      const { chatId, userType } = data;
+      
+      // Verify user can access this chat
+      if (userType === 'user') {
+        const chat = await Chat.findOne({ 
+          chatId, 
+          userId: socket.userId 
+        });
+        if (!chat) return;
+      }
+      
+      socket.to(chatId).emit('user_typing', { userType, isTyping: false });
+      
+      if (userType === 'agent') {
+        Chat.findOneAndUpdate(
+          { chatId },
+          { agentTyping: false }
+        ).exec();
+      }
+    } catch (error) {
+      console.error('Error handling typing stop:', error);
     }
   });
 
-  // Handle agent leaving chat
-  socket.on('leave_chat', (data) => {
-    const { chatId, userType } = data;
-    
-    if (userType === 'agent') {
-      Chat.findOneAndUpdate(
-        { chatId },
-        { isAgentOnline: false, agentTyping: false }
-      ).then(() => {
-        socket.to(chatId).emit('agent_status', { isOnline: false });
-      });
+  // Handle leaving chat with ownership verification
+  socket.on('leave_chat', async (data) => {
+    try {
+      const { chatId, userType } = data;
+      
+      // Verify user can access this chat
+      if (userType === 'user') {
+        const chat = await Chat.findOne({ 
+          chatId, 
+          userId: socket.userId 
+        });
+        if (!chat) return;
+      }
+      
+      if (userType === 'agent') {
+        Chat.findOneAndUpdate(
+          { chatId },
+          { isAgentOnline: false, agentTyping: false }
+        ).then(() => {
+          socket.to(chatId).emit('agent_status', { isOnline: false });
+        });
+      }
+      
+      socket.leave(chatId);
+    } catch (error) {
+      console.error('Error leaving chat:', error);
     }
-    
-    socket.leave(chatId);
   });
 
   // Handle disconnection

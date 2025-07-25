@@ -19,7 +19,11 @@ const agentLogin = async (req, res) => {
     // Create JWT token for agent
     const token = jwt.sign(
       {
+        id: 'agent_' + Date.now(),
         type: 'agent',
+        role: 'agent',
+        email: process.env.AGENT_USERNAME + '@system',
+        userName: process.env.AGENT_NAME,
         username: process.env.AGENT_USERNAME,
         name: process.env.AGENT_NAME
       },

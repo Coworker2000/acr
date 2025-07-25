@@ -2,9 +2,8 @@
 
 import { io, Socket } from "socket.io-client";
 
-const BACKEND_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-backend-url.com' // Replace with your production backend URL
-  : 'http://localhost:5000';
+// Force production URL since the backend is deployed
+const BACKEND_URL = 'https://arleen-credit-repair-backend.onrender.com';
 
 class SocketService {
   private socket: Socket | null = null;
@@ -17,11 +16,14 @@ class SocketService {
     return SocketService.instance;
   }
 
-  public connect(): Socket {
+  public connect(token?: string): Socket {
     if (!this.socket) {
       this.socket = io(BACKEND_URL, {
         withCredentials: true,
-        transports: ['websocket', 'polling']
+        transports: ['websocket', 'polling'],
+        auth: {
+          token: token
+        }
       });
 
       this.socket.on('connect', () => {

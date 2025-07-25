@@ -47,10 +47,31 @@ export default function LoginPage() {
       }
 
       const data = await res.json();
+      
+      console.log('Backend login response:', data);
+      console.log('Token from backend:', data.token);
+      console.log('User from backend:', data.user);
 
       // Store token and user info
-      // localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        console.log('Token stored in localStorage');
+      } else {
+        console.error('No token received from backend!');
+      }
+      
+      if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        console.log('User stored in localStorage');
+      }
+      
+      console.log('Login successful - verification:', {
+        tokenExists: !!data.token,
+        userExists: !!data.user,
+        tokenLength: data.token ? data.token.length : 0,
+        storedToken: localStorage.getItem('token'),
+        storedUser: localStorage.getItem('user')
+      });
 
       router.push("/plans");
     } catch (error: any) {

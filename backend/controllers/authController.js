@@ -18,9 +18,21 @@ exports.register = async (req, res) => {
       hearAboutUs,
     } = req.body;
 
-    if (!email || !password || !firstName || !lastName || !phone || !address || !city || !state || !zipCode || !creditGoals || !hearAboutUs) {
-  return res.status(400).json({ msg: "Missing required fields" });
-}
+    if (
+      !email ||
+      !password ||
+      !firstName ||
+      !lastName ||
+      !phone ||
+      !address ||
+      !city ||
+      !state ||
+      !zipCode ||
+      !creditGoals ||
+      !hearAboutUs
+    ) {
+      return res.status(400).json({ msg: "Missing required fields" });
+    }
 
     // Check if email already exists
     const existingUser = await User.findOne({ email });
@@ -48,9 +60,19 @@ exports.register = async (req, res) => {
     await user.save(); // <-- Save happens here
 
     // Generate token after saving
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        userName: user.firstName, 
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    console.log("JWT Payload:", jwt.decode(token));
 
     // Send response with token and user info
     res.status(201).json({
@@ -62,6 +84,7 @@ exports.register = async (req, res) => {
         email: user.email,
       },
     });
+    console.log("JWT Payload:", jwt.decode(token));
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Error registering user", error: err.message });
@@ -75,9 +98,17 @@ exports.login = async (req, res) => {
     return res.status(401).json({ msg: "Invalid credentials" });
   }
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
-  });
+  const token = jwt.sign(
+    {
+      id: user._id,
+      email: user.email,
+      userName: user.firstName,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1d",
+    }
+  );
 
   res.json({
     token,
