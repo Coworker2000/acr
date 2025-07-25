@@ -153,11 +153,14 @@ export default function AgentDashboard() {
 
   const loadActiveChats = async () => {
     try {
-      const response = await fetch("https://arleen-credit-repair-backend.onrender.com/chat/active", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("agentToken")}`,
-        },
-      });
+      const response = await fetch(
+        "https://arleen-credit-repair-backend.onrender.com/chat/active",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("agentToken")}`,
+          },
+        }
+      );
 
       const data = await response.json();
       if (data.success) {
@@ -179,13 +182,13 @@ export default function AgentDashboard() {
     }
   };
 
-    const loadChatHistory = async (chatId: string) => {
+  const loadChatHistory = async (chatId: string) => {
     try {
       const response = await fetch(
         `https://arleen-credit-repair-backend.onrender.com/chat/agent/history/${chatId}`,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("agentToken")}`,
           },
         }
@@ -301,14 +304,14 @@ export default function AgentDashboard() {
       {/* Header */}
       <div className="bg-white/5 backdrop-blur-md border-b border-white/10 p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center space-x-4"></div>
           <div className="flex items-center space-x-4">
-            <MessageCircle className="h-6 w-6 text-white" />
-            <h1 className="text-xl font-bold text-white">Agent Dashboard</h1>
+            <span className="text-white">Welcome, {agentName}</span>
             <div className="flex items-center space-x-2">
               {isConnected ? (
                 <>
                   <Wifi className="h-4 w-4 text-green-400" />
-                  <span className="text-green-400 text-sm">Connected</span>
+                  {/* <span className="text-green-400 text-sm">Connected</span> */}
                 </>
               ) : (
                 <>
@@ -317,18 +320,6 @@ export default function AgentDashboard() {
                 </>
               )}
             </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-white">Welcome, {agentName}</span>
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              size="sm"
-              className="text-white border-white/20 hover:bg-white/10 bg-transparent"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
           </div>
         </div>
       </div>
@@ -344,14 +335,16 @@ export default function AgentDashboard() {
         </Button>
 
         {/* Chat List Sidebar */}
-        <div className={`
-          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        <div
+          className={`
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
           fixed lg:relative z-40
           w-80 h-full
           bg-white/5 backdrop-blur-md border-r border-white/10
           transition-transform duration-300 ease-in-out
-        `}>
+        `}
+        >
           {/* Mobile close button */}
           <div className="lg:hidden absolute top-4 right-4">
             <Button
@@ -361,6 +354,15 @@ export default function AgentDashboard() {
               className="text-white border-white/20 hover:bg-white/10 bg-transparent"
             >
               <X className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              size="sm"
+              className="text-white border-white/20 hover:bg-white/10 bg-transparent"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
             </Button>
           </div>
 
@@ -434,8 +436,14 @@ export default function AgentDashboard() {
                         </Badge>
                         <div className="flex items-center space-x-1 text-xs text-gray-400">
                           <Clock className="h-3 w-3" />
-                          <span className="hidden sm:inline">{chat.lastActivity.toLocaleTimeString()}</span>
-                          <span className="sm:hidden">{chat.lastActivity.toLocaleTimeString([], {timeStyle: 'short'})}</span>
+                          <span className="hidden sm:inline">
+                            {chat.lastActivity.toLocaleTimeString()}
+                          </span>
+                          <span className="sm:hidden">
+                            {chat.lastActivity.toLocaleTimeString([], {
+                              timeStyle: "short",
+                            })}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -455,7 +463,7 @@ export default function AgentDashboard() {
 
         {/* Overlay for mobile */}
         {isSidebarOpen && (
-          <div 
+          <div
             className="lg:hidden fixed inset-0 bg-black/50 z-30"
             onClick={() => setIsSidebarOpen(false)}
           />
