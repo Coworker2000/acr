@@ -12,7 +12,7 @@ const {
 const verifyToken = require('../middleware/verifyToken');
 
 // Create or get existing chat (requires authentication)
-router.post('/create', verifyToken, createOrGetChat);
+router.post('/create', createOrGetChat);
 
 // Get chat history (requires authentication)
 router.get('/history/:chatId', verifyToken, getChatHistory);

@@ -156,7 +156,7 @@ export default function ChatPage() {
         const data = await response.json();
         console.log("Chat API response:", { status: response.status, data });
 
-        if (data.success) {
+        if (response.ok && data.success) {
           const chat = data.chat;
           setChatId(chat.chatId);
           setMessages(
@@ -170,8 +170,20 @@ export default function ChatPage() {
         } else {
           const errorMessage =
             data.message || data.msg || data.error || "Unknown error";
-          console.error("Failed to create/get chat:", errorMessage);
-          if (errorMessage === "Authentication required") {
+          console.error("Failed to create/get chat:", {
+            status: response.status,
+            errorMessage,
+            fullResponse: data,
+            requestBody
+          });
+          
+          // Show user-friendly error message
+          alert(`Chat Error: ${errorMessage}\n\nPlease try logging out and logging in again.`);
+          
+          if (errorMessage.includes("Authentication") || errorMessage.includes("token")) {
+            // Clear authentication and redirect
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
             router.push("/login");
           }
         }

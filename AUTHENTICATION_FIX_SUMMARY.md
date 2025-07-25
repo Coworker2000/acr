@@ -116,6 +116,8 @@ const userName = validation.userName!;
 | `app/chat/page.tsx` | Updated validation logic & API requests | Fix authentication flow |
 | `app/plans/page.tsx` | Improved logout functionality | Better data cleanup |
 | `app/register/page.tsx` | Fixed user data storage | Consistency with login |
+| `backend/controllers/chatController.js` | Fixed token field extraction & API response | Handle new token structure |
+| `backend/routes/chatRoute.js` | Removed duplicate middleware | Avoid authentication conflicts |
 
 ---
 

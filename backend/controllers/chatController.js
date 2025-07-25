@@ -25,32 +25,80 @@ const verifyToken = (req) => {
 // Create or get existing chat
 const createOrGetChat = async (req, res) => {
   try {
-    const { id, email, name } = verifyToken(req);
+    const { userEmail, userName, selectedPlan } = req.body;
+    const decoded = verifyToken(req);
+    
+    console.log('Token decoded:', decoded);
+    console.log('Request body:', { userEmail, userName, selectedPlan });
+    
+    // Extract user info with fallbacks from token
+    const email = userEmail || decoded.email || decoded.userEmail;
+    const name = userName || decoded.userName || decoded.username || decoded.firstName;
+    const userId = decoded.id || decoded.userId;
+    
+    console.log('Extracted values:', { email, name, userId });
 
     if (!email || !name) {
+      console.error('Missing required fields:', { email: !!email, name: !!name });
       return res.status(401).json({
         msg: "Authentication error: Missing user information in token. Please login again.",
       });
     }
 
-    let existingChat = await Chat.findOne({ userEmail: email });
+    // Try to find existing chat by userId first, then by email
+    let existingChat = await Chat.findOne({ 
+      $or: [
+        { userId: userId },
+        { userEmail: email }
+      ]
+    });
 
     if (existingChat) {
-      return res.status(200).json(existingChat);
+      console.log('Found existing chat:', existingChat.chatId);
+      return res.status(200).json({ 
+        success: true, 
+        chat: {
+          chatId: existingChat.chatId,
+          messages: existingChat.messages,
+          selectedPlan: existingChat.selectedPlan,
+          status: existingChat.status,
+          userName: existingChat.userName,
+          userEmail: existingChat.userEmail,
+        }
+      });
     }
 
     const newChat = new Chat({
       chatId: generateChatId(),
+      userId: userId,
       userEmail: email,
       userName: name,
+      selectedPlan: selectedPlan,
       messages: [],
+      status: 'active'
     });
 
     await newChat.save();
-    res.status(201).json(newChat);
+    console.log('Created new chat:', newChat.chatId);
+    
+    res.status(201).json({ 
+      success: true, 
+      chat: {
+        chatId: newChat.chatId,
+        messages: newChat.messages,
+        selectedPlan: newChat.selectedPlan,
+        status: newChat.status,
+        userName: newChat.userName,
+        userEmail: newChat.userEmail,
+      }
+    });
   } catch (err) {
     console.error("Error creating or fetching chat:", err);
-    res.status(500).json({ msg: "Server error" });
+    res.status(500).json({ 
+      success: false,
+      msg: "Server error",
+      error: err.message 
+    });
   }
 };
 
